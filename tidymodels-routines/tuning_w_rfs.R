@@ -21,7 +21,8 @@ grid <-
   spec_nn |> 
   extract_parameter_set_dials() |> 
   update(hidden_units = hidden_units(c(1,8))) |> 
-  grid_regular(levels = 4)
+  grid_regular(levels = 4) |> 
+  mutate(param_set = row_number())
 
 
 result <-
@@ -35,7 +36,7 @@ pmap_dfr(folds, \(splits, id) {
     message(str_glue("  {num_preds}"))
 
     # each iteration, try a combination of parameters from "grid"
-    future_pmap_dfr(grid, \(hidden_units, penalty, epochs){
+    future_pmap_dfr(grid, \(hidden_units, penalty, epochs, ...){  # use param_set column to id
 
       # specification
       spec <- 
